@@ -20,7 +20,7 @@ public class Child : MonoBehaviour
     private GameManager gameManager;
 
 
-    private float spreadDelay = 2.0f;
+    private float spreadDelay = 1.0f;
     private float currentSpreadTime = 0.0f;
 
     public bool isSick = false;
@@ -28,7 +28,7 @@ public class Child : MonoBehaviour
     public float spreadChance = 0.25f;
 
     public bool isDead = false;
-    public float timeToDie = 10.0f;
+    private float timeToDie = 7.5f;
     public float currentTimeToDie = 0.0f;
     private ParticleSystem[] particleSystems;
 
@@ -49,6 +49,8 @@ public class Child : MonoBehaviour
         sr = (SpriteRenderer) GetComponent(typeof(SpriteRenderer));
         particleSystems = gameObject.GetComponentsInChildren<ParticleSystem>();
         particleSystems[0].gameObject.SetActive(false);
+
+        timeToDie = timeToDie + Random.Range(-2.5f, 2.5f);
     }
 
     // Update is called once per frame
@@ -56,6 +58,7 @@ public class Child : MonoBehaviour
     {
         if (isDead){
             dir = Vector3.zero;
+            rb.mass = 0.05f;
             particleSystems[0].gameObject.SetActive(false);
             return;
         }
@@ -69,7 +72,7 @@ public class Child : MonoBehaviour
 
         if (isSick) {
            sr.color = Color.red;
-           currentSpeed = maxSpeed * (1 - 0.5f * (currentTimeToDie / timeToDie));
+           currentSpeed = maxSpeed * (1 - 0.20f * (currentTimeToDie / timeToDie));
         }
         else {
             sr.color = Color.white;
@@ -91,12 +94,15 @@ public class Child : MonoBehaviour
 
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, spreadRadius);
         for (int i = 0; i < hitColliders.Length; i++) {
-            if (hitColliders[i].gameObject.tag != "Child")
-                continue;
-            
-            if (Random.value < spreadChance) {
-                ((Child) hitColliders[i].gameObject.GetComponent(typeof(Child))).isSick = true;
+            if (hitColliders[i].gameObject.tag == "Waypoint"){
+                ((Waypoint) hitColliders[i].gameObject.GetComponent(typeof(Waypoint))).Infect();
             }
+
+            // if (hitColliders[i].gameObject.tag == "Child"){
+            //     if (Random.value < spreadChance) {
+            //         ((Child) hitColliders[i].gameObject.GetComponent(typeof(Child))).isSick = true;
+            //     }
+            // }
         }
 
     }

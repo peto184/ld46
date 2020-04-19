@@ -48,19 +48,20 @@ public class Mother : MonoBehaviour
             tmp.z = 0.0f;
             Vector3 sprayDir = tmp / tmp.magnitude;
 
-            Debug.Log($"{sprayTarget}");
             particleSystems[0].gameObject.SetActive(true);
 
             // move to the position
-            particleSystems[0].transform.position = transform.position + sprayDir;
-            //Vector3 sprayRot = new Vector3(-90, sprayTarget.y, sprayTarget.z);
+            particleSystems[0].transform.position = (transform.position + sprayDir);
+            particleSystems[0].transform.localPosition *= 0.25f;
+            Vector3 sprayRot = new Vector3(-90, sprayTarget.y, sprayTarget.z);
             
             //Quaternion sprayRot = Quaternion.LookRotation(particleSystems[0].transform.position, sprayTarget);
-            //particleSystems[0].transform.rotation = sprayRot;
+            // particleSystems[0].transform.rotation = sprayRot;
+            
             Vector3 diff = sprayTarget - particleSystems[0].transform.position;
             diff.Normalize();
-            float rot_z = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
-            particleSystems[0].transform.rotation = Quaternion.Euler(0f, 0f, rot_z - 90);
+            float rot_z = Mathf.Atan2(tmp.y, tmp.x) * Mathf.Rad2Deg;
+            particleSystems[0].transform.rotation = Quaternion.Euler(0f, 0f, rot_z);
         }
         else {
             particleSystems[0].gameObject.SetActive(false);

@@ -10,32 +10,69 @@ public class GameManager : MonoBehaviour
     public GameObject childPrefab;
 
     public int nWaypoints = 5;
-    public float period = 5.0f;
+    public float period = 100.0f;
     private float passedTime = 0.0f;
 
-    public int nInitHealthyChildren = 10;
-    public int nInitSickChildren = 2;
+    private int nInitHealthyChildren = 30;
+    private int nInitSickChildren = 3;
 
     public List<GameObject> children = new List<GameObject>();
+
+    private int level = 0;
 
     // Start is called before the first frame update
     void Start()
     {
-        RegenerateWaypoints();
-        SpawnChildren();
+        //RegenerateWaypoints();
+        float r = 2.5f;
+        AddWaypointOnLocation(r, r);
+        AddWaypointOnLocation(-r, -r);
+        AddWaypointOnLocation(r, -r);
+        AddWaypointOnLocation(-r, r);
+        AddWaypoint(2);
+        SpawnChildren(nInitHealthyChildren, nInitSickChildren);
     }
 
     // Update is called once per frame
     void Update()
     {
-        nWaypoints = GetHealthy() + 1;
-
         passedTime += Time.deltaTime;
         if (passedTime > period) {
             passedTime = 0.0f;
             // Regenerate
-            RegenerateWaypoints();
+            // RegenerateWaypoints();
         }
+
+
+        if (GetHealthy() == 0) {
+            // Gameover
+            Debug.Log($"you lose.");
+        }
+        else if (GetSick() == 0) {
+            Debug.Log($"you win level");
+            // Game win
+            LevelUp();
+        }
+
+
+    }
+
+    private void LevelUp() {
+        level += 1;
+        nInitSickChildren += 2;
+        // nInitHealthyChildren += 1;
+        
+        nWaypoints += 1;
+        if (nWaypoints < 3)
+            nWaypoints = 3;
+        
+        AddWaypoint(1);
+        int healthy = GetHealthy();
+        SpawnChildren(20-healthy, nInitSickChildren);
+    }
+
+    public int GetLevel() {
+        return level;
     }
 
     public int GetHealthy() {
@@ -48,12 +85,60 @@ public class GameManager : MonoBehaviour
         return count;
     }
 
-    public void SpawnChildren() {
-        for (int i = 0; i < nInitHealthyChildren; i++) {
-            float x = Random.Range(1.0f, 5f);
+    public int GetSick() {
+        int count = 0;
+        foreach (GameObject go in children) {
+            Child c = (Child) go.GetComponent(typeof(Child));
+            if (c.isSick && !c.isDead)
+                count++;
+        }
+        return count;
+    }
+
+    public int GetDead() {
+        int count = 0;
+        foreach (GameObject go in children) {
+            Child c = (Child) go.GetComponent(typeof(Child));
+            if (c.isDead)
+                count++;
+        }
+        return count;
+    }
+
+    void AddWaypoint(int n) {
+
+        Vector2 topRightCorner = new Vector2(1, 1);
+        Vector2 edgeVector = Camera.main.ViewportToWorldPoint(topRightCorner);
+
+        float max_x = edgeVector.x;
+        float max_y = edgeVector.y;
+        Debug.Log($"{max_x} - {max_y}");
+
+        for (int i = 0; i < n; i++) {
+            float x = Random.Range(0.0f, max_x - 0.75f);
             if (Random.value > .5f) 
                 x *= -1.0f;
-            float y = Random.Range(1.0f, 5f);
+            float y = Random.Range(0.0f, max_y - 0.75f);
+            if (Random.value > .5f)
+                y *= -1.0f;
+                
+            GameObject wp = (GameObject) Instantiate(waypointPrefab, new Vector3 (x, y, 0f), Quaternion.identity);
+            waypoints.Add(wp);
+        }
+    }
+
+    void AddWaypointOnLocation(float x, float y) {
+        GameObject wp = (GameObject) Instantiate(waypointPrefab, new Vector3 (x, y, 0f), Quaternion.identity);
+        waypoints.Add(wp);
+    }
+
+
+    public void SpawnChildren(int healthy, int sick) {
+        for (int i = 0; i < healthy; i++) {
+            float x = Random.Range(8.0f, 15f);
+            if (Random.value > .5f) 
+                x *= -1.0f;
+            float y = Random.Range(8.0f, 15f);
             if (Random.value > .5f)
                 y *= -1.0f;
                 
@@ -61,11 +146,11 @@ public class GameManager : MonoBehaviour
             children.Add(child);            
         }
 
-        for (int i = 0; i < nInitSickChildren; i++) {
-            float x = Random.Range(1.0f, 5f);
+        for (int i = 0; i < sick; i++) {
+            float x = Random.Range(8.0f, 15f);
             if (Random.value > .5f) 
                 x *= -1.0f;
-            float y = Random.Range(1.0f, 5f);
+            float y = Random.Range(8.0f, 15f);
             if (Random.value > .5f)
                 y *= -1.0f;
                 
@@ -87,12 +172,18 @@ public class GameManager : MonoBehaviour
         }
         waypoints.Clear();
 
-        // Init new waypoints
+        Vector2 topRightCorner = new Vector2(1, 1);
+        Vector2 edgeVector = Camera.main.ViewportToWorldPoint(topRightCorner);
+
+        float max_x = edgeVector.x;
+        float max_y = edgeVector.y;
+        Debug.Log($"{max_x} - {max_y}");
+
         for (int i = 0; i < nWaypoints; i++) {
-            float x = Random.Range(1.0f, 5f);
+            float x = Random.Range(0.0f, max_x - 0.75f);
             if (Random.value > .5f) 
                 x *= -1.0f;
-            float y = Random.Range(1.0f, 5f);
+            float y = Random.Range(0.0f, max_y - 0.75f);
             if (Random.value > .5f)
                 y *= -1.0f;
                 

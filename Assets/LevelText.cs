@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class StatusText : MonoBehaviour
+public class LevelText : MonoBehaviour
 {
 
     private GameManager gameManager;
-
     private Text text;
 
     // Start is called before the first frame update
@@ -21,10 +20,7 @@ public class StatusText : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        int healthy = gameManager.GetHealthy();
-        int sick = gameManager.GetSick();
-        int dead = gameManager.GetDead();
-
-        text.text = $"Healthy: {healthy}\nSick: {sick}\nDead: {dead}";
+        int level = gameManager.GetLevel() + 1;
+        text.text = $"Level: {level}";
     }
 }

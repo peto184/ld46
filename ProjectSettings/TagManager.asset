@@ -7,6 +7,7 @@ TagManager:
   - MeetingLocation
   - GameManager
   - Child
+  - Waypoint
   layers:
   - Default
   - TransparentFX
@@ -16,9 +17,9 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
+  - Mother
+  - Waypoint
+  - Spray
   - 
   - 
   - 
