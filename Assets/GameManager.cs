@@ -13,8 +13,8 @@ public class GameManager : MonoBehaviour
     public float period = 5.0f;
     private float passedTime = 0.0f;
 
-    public int nHealthyChildren = 10;
-    public int nSickChildren = 2;
+    public int nInitHealthyChildren = 10;
+    public int nInitSickChildren = 2;
 
     public List<GameObject> children = new List<GameObject>();
 
@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        nWaypoints = GetHealthy() + 1;
+
         passedTime += Time.deltaTime;
         if (passedTime > period) {
             passedTime = 0.0f;
@@ -36,8 +38,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public int GetHealthy() {
+        int count = 0;
+        foreach (GameObject go in children) {
+            Child c = (Child) go.GetComponent(typeof(Child));
+            if (!c.isSick && !c.isDead)
+                count++;
+        }
+        return count;
+    }
+
     public void SpawnChildren() {
-        for (int i = 0; i < nHealthyChildren; i++) {
+        for (int i = 0; i < nInitHealthyChildren; i++) {
             float x = Random.Range(1.0f, 5f);
             if (Random.value > .5f) 
                 x *= -1.0f;
@@ -49,7 +61,7 @@ public class GameManager : MonoBehaviour
             children.Add(child);            
         }
 
-        for (int i = 0; i < nSickChildren; i++) {
+        for (int i = 0; i < nInitSickChildren; i++) {
             float x = Random.Range(1.0f, 5f);
             if (Random.value > .5f) 
                 x *= -1.0f;

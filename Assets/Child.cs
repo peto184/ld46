@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Child : MonoBehaviour
 {
-    public float speed = 50.0f;
+    public float maxSpeed = 50.0f;
+
+    private float currentSpeed = 50.0f;
     public float rotationSpeed = 10f;
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -28,6 +30,7 @@ public class Child : MonoBehaviour
     public bool isDead = false;
     public float timeToDie = 10.0f;
     public float currentTimeToDie = 0.0f;
+    private ParticleSystem[] particleSystems;
 
     void OnDrawGizmosSelected()
     {
@@ -44,6 +47,8 @@ public class Child : MonoBehaviour
         gameManager = (GameManager)go.GetComponent(typeof(GameManager));
         target = GetRandomWaypoint();
         sr = (SpriteRenderer) GetComponent(typeof(SpriteRenderer));
+        particleSystems = gameObject.GetComponentsInChildren<ParticleSystem>();
+        particleSystems[0].gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -51,17 +56,20 @@ public class Child : MonoBehaviour
     {
         if (isDead){
             dir = Vector3.zero;
+            particleSystems[0].gameObject.SetActive(false);
             return;
         }
 
         UpdatePosition();
         if (isSick){
+            particleSystems[0].gameObject.SetActive(true);
             UpdateSpread();
             currentTimeToDie += Time.deltaTime;
         }
 
         if (isSick) {
            sr.color = Color.red;
+           currentSpeed = maxSpeed * (1 - 0.5f * (currentTimeToDie / timeToDie));
         }
         else {
             sr.color = Color.white;
@@ -134,7 +142,7 @@ public class Child : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.velocity = dir * speed * Time.fixedDeltaTime;
+        rb.velocity = dir * currentSpeed * Time.fixedDeltaTime;
     }
 
     GameObject GetRandomWaypoint()
