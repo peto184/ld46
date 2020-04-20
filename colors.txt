@@ -1,0 +1,17 @@
+ECA860
+C9A55D
+A07240
+716249
+546049
+
+
+Disinfectant: 529711
+R: 182 G: 56 B: 50
+
+
+Zvuky:
+	- kasel, ked sa ktosi nakazi
+	- zvuk spreju
+	- levelup jingel
+	
+Chiller Regular

@@ -13,9 +13,16 @@ public class Mother : MonoBehaviour
 
     private ParticleSystem[] particleSystems;
 
+    private GameManager gameManager;
+
+    private float disinfectCharge = 1.0f;
+
+
     // Start is called before the first frame update
     void Start()
     {
+        GameObject go = GameObject.FindWithTag("GameManager");
+        gameManager = (GameManager)go.GetComponent(typeof(GameManager));  
         rb = GetComponent<Rigidbody2D>();
         particleSystems = gameObject.GetComponentsInChildren<ParticleSystem>();
     }
@@ -39,10 +46,11 @@ public class Mother : MonoBehaviour
 
     void HandleDisinfectant()
     {
-
         //if (Input.GetMouseButtonDown(0))
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && !gameManager.gameOver && disinfectCharge > 0.0f)
         {
+            disinfectCharge -= Time.deltaTime;
+
             Vector3 sprayTarget = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 tmp = sprayTarget - transform.position;
             tmp.z = 0.0f;
@@ -65,13 +73,19 @@ public class Mother : MonoBehaviour
         }
         else {
             particleSystems[0].gameObject.SetActive(false);
+            disinfectCharge += Time.deltaTime;
         }
 
+        disinfectCharge = Mathf.Clamp(disinfectCharge, 0, 1);
     }
 
     void FixedUpdate()
     {
         rb.velocity = dir * speed * Time.fixedDeltaTime;
+    }
+
+    public float GetDisinfectantCharge(){
+        return disinfectCharge;
     }
 
 }

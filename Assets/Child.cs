@@ -25,12 +25,16 @@ public class Child : MonoBehaviour
 
     public bool isSick = false;
     public float spreadRadius = 1.0f;
-    public float spreadChance = 0.25f;
+    // private float spreadChance = 0.5f;
 
     public bool isDead = false;
     private float timeToDie = 7.5f;
     public float currentTimeToDie = 0.0f;
     private ParticleSystem[] particleSystems;
+
+
+    public AudioClip[] coughs;
+    public AudioSource audioSource;
 
     void OnDrawGizmosSelected()
     {
@@ -51,6 +55,8 @@ public class Child : MonoBehaviour
         particleSystems[0].gameObject.SetActive(false);
 
         timeToDie = timeToDie + Random.Range(-2.5f, 2.5f);
+
+        audioSource = audioSource ?? GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -191,5 +197,13 @@ public class Child : MonoBehaviour
 
         return closest;
     }
+
+    public void GetSick() {
+        isSick = true;
+        audioSource.pitch = Random.Range (0.7f , 1.3f);
+        audioSource.volume = 0.1f;
+        audioSource.PlayOneShot(coughs[Random.Range(0, coughs.Length)]);
+    }
+
 
 }

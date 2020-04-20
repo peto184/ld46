@@ -4,9 +4,17 @@ using UnityEngine;
 
 public class Disinfect : MonoBehaviour
 {
+    public AudioClip spray;
+    public AudioSource audioSource;
+
     void Start()
     {
-        Debug.Log($"init");
+        audioSource.Stop();
+        audioSource.loop = true;
+        audioSource.clip = spray;
+        audioSource.volume = 0.35f;
+        audioSource.pitch = 1.2f;
+        audioSource.Play();
     }
 
     void OnTriggerStay2D(Collider2D other)

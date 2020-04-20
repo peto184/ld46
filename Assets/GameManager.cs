@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -20,9 +21,18 @@ public class GameManager : MonoBehaviour
 
     private int level = 0;
 
+    public GameObject gameOverPanel;
+
+    public bool gameOver = false;
+    public AudioClip levelUp;
+    public AudioSource audioSource;
+
+    private int nHealthyLevel = 30;
+
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 1f;
         //RegenerateWaypoints();
         float r = 2.5f;
         AddWaypointOnLocation(r, r);
@@ -47,19 +57,38 @@ public class GameManager : MonoBehaviour
         if (GetHealthy() == 0) {
             // Gameover
             Debug.Log($"you lose.");
+            GameOver();
         }
         else if (GetSick() == 0) {
             Debug.Log($"you win level");
             // Game win
             LevelUp();
         }
+    }
 
+    public void StartAgain() {
+        Debug.Log($"Reloading Game.");
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("SampleScene");
+        Start();
+    }
 
+    public void ExitGame() {
+        Debug.Log($"Exiting to menu ..");
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Menu");
+    }
+
+    private void GameOver() {
+        gameOver = true;
+        Time.timeScale = 0f;
+        gameOverPanel.SetActive(true);
     }
 
     private void LevelUp() {
         level += 1;
         nInitSickChildren += 2;
+        nHealthyLevel += 2;
         // nInitHealthyChildren += 1;
         
         nWaypoints += 1;
@@ -68,7 +97,9 @@ public class GameManager : MonoBehaviour
         
         AddWaypoint(1);
         int healthy = GetHealthy();
-        SpawnChildren(20-healthy, nInitSickChildren);
+        SpawnChildren(nHealthyLevel-healthy, nInitSickChildren);
+
+        audioSource.PlayOneShot(levelUp);
     }
 
     public int GetLevel() {
@@ -112,7 +143,6 @@ public class GameManager : MonoBehaviour
 
         float max_x = edgeVector.x;
         float max_y = edgeVector.y;
-        Debug.Log($"{max_x} - {max_y}");
 
         for (int i = 0; i < n; i++) {
             float x = Random.Range(0.0f, max_x - 0.75f);
@@ -177,7 +207,6 @@ public class GameManager : MonoBehaviour
 
         float max_x = edgeVector.x;
         float max_y = edgeVector.y;
-        Debug.Log($"{max_x} - {max_y}");
 
         for (int i = 0; i < nWaypoints; i++) {
             float x = Random.Range(0.0f, max_x - 0.75f);

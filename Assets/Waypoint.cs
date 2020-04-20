@@ -12,15 +12,17 @@ public class Waypoint : MonoBehaviour
     private float currentHealth = 0.0f;
     
     private float minHealth = -2.5f;
-    private float disinfectSpeed = 5f;
+    private float disinfectSpeed = 15f;
     private SpriteRenderer sr;
 
     public float spreadRadius = 0.5f; 
-    public float spreadChance = 0.01f;
+    private float spreadChance = 0.5f;
 
     private float spreadDelay = 1.0f;
     private float currentSpreadTime = 0.0f;
 
+    private Color disinfectantColor = new Color(82/255f, 151/255f, 17/255f, 1f);
+    private Color sickColor = new Color(182/255f, 56/255f, 50/255f, 1f);
 
     // Start is called before the first frame update
     void Start()
@@ -42,12 +44,12 @@ public class Waypoint : MonoBehaviour
 
         if (isSick) {
             currentHealth = Mathf.Clamp(currentHealth - Time.deltaTime, minHealth, 0f);
-            sr.color = Color.Lerp(Color.white, Color.red, currentHealth / (minHealth));
+            sr.color = Color.Lerp(Color.white, sickColor, currentHealth / (minHealth));
             Spread();
         }
         else if (isDisinfected && currentHealth > 0.0f) {
             currentHealth -= Time.deltaTime;
-            sr.color = Color.Lerp(Color.white, Color.green, currentHealth / maxHealth);
+            sr.color = Color.Lerp(Color.white, disinfectantColor, currentHealth / maxHealth);
         }
         else {
             // currentHealth = 0.0f;
@@ -69,16 +71,17 @@ public class Waypoint : MonoBehaviour
         currentHealth += disinfectSpeed*deltaTime;
 
         if (currentHealth < 0.0f) {
-            sr.color = Color.Lerp(Color.white, Color.red, currentHealth / (minHealth));
+            sr.color = Color.Lerp(Color.white, sickColor, currentHealth / (minHealth));
         }
         else {
-            sr.color = Color.Lerp(Color.white, Color.green, currentHealth / maxHealth);
+            sr.color = Color.Lerp(Color.white, disinfectantColor, currentHealth / maxHealth);
         }
     }
 
     void Spread() {
         if (currentSpreadTime < spreadDelay){
-            currentSpreadTime += Time.deltaTime;
+            //currentSpreadTime += Time.deltaTime;
+            currentSpreadTime += Random.Range(0.0f, 2.0f) * Time.deltaTime;
             return;
         }
         currentSpreadTime = 0.0f;
@@ -87,7 +90,8 @@ public class Waypoint : MonoBehaviour
         for (int i = 0; i < hitColliders.Length; i++) {
             if (hitColliders[i].gameObject.tag == "Child"){
                 if (Random.value < spreadChance){
-                    ((Child) hitColliders[i].gameObject.GetComponent(typeof(Child))).isSick = true;
+                    //((Child) hitColliders[i].gameObject.GetComponent(typeof(Child))).isSick = true;
+                    ((Child) hitColliders[i].gameObject.GetComponent(typeof(Child))).GetSick();
                 }
             }
         }
